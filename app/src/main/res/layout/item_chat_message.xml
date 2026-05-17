@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="4dp">
+
+    <!-- User message: bubble, right-aligned, max width -->
+    <LinearLayout
+        android:id="@+id/bubble_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="420dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@drawable/bubble_user"
+        android:backgroundTint="?attr/colorPrimaryContainer"
+        android:layout_gravity="end"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_user_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnPrimaryContainer"
+            android:textSize="16sp"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+    <!-- Assistant message: full width, no bubble -->
+    <LinearLayout
+        android:id="@+id/bubble_assistant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_assistant_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            android:textIsSelectable="true" />
+
+        <LinearLayout
+            android:id="@+id/dots_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingTop="4dp"
+            android:visibility="gone">
+
+            <View
+                android:id="@+id/dot1"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/dot_loading" />
+
+            <View
+                android:id="@+id/dot2"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/dot_loading" />
+
+            <View
+                android:id="@+id/dot3"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/dot_loading" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Command execution message: full width -->
+    <LinearLayout
+        android:id="@+id/command_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/command_header"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:id="@+id/tv_command_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ImageView
+                android:id="@+id/iv_command_chevron"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_chevron_down"
+                android:tint="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/command_output_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorOutlineVariant"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_command_output"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:typeface="monospace"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:background="?attr/colorSurfaceVariant"
+                android:padding="12dp"
+                android:gravity="start" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Tool call message: shows function name + args -->
+    <LinearLayout
+        android:id="@+id/toolcall_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_toolcall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:typeface="monospace"
+            android:textColor="?attr/colorPrimary"
+            android:padding="8dp"
+            android:background="@drawable/bg_toolcall"
+            android:gravity="start"
+            android:textIsSelectable="true" />
+
+    </LinearLayout>
+
+</FrameLayout>

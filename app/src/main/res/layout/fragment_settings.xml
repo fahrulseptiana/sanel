@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_endpoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_endpoint"
+            android:layout_marginBottom="12dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_endpoint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_endpoint"
+                android:inputType="textUri"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_api_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_api_key"
+            android:layout_marginBottom="12dp"
+            app:endIconMode="password_toggle"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_api_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_api_key"
+                android:inputType="textPassword"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_model"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/label_model"
+            android:layout_marginBottom="20dp"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_model"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_model"
+                android:inputType="text"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/advanced_header"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/label_advanced"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <ImageView
+                android:id="@+id/iv_chevron"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chevron_down"
+                android:scaleType="centerCrop" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/advanced_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:animateLayoutChanges="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_temperature"
+                android:textSize="14sp"
+                android:layout_marginTop="12dp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:valueFrom="0.0"
+                android:valueTo="2.0"
+                android:stepSize="0.1"
+                android:value="0.7" />
+
+            <TextView
+                android:id="@+id/tv_temperature_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.7"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_max_tokens"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/label_max_tokens"
+                android:layout_marginTop="12dp"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_max_tokens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="4096"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_thinking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_thinking"
+                android:layout_marginTop="12dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_thinking_budget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/label_thinking_budget"
+                android:layout_marginTop="12dp"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_thinking_budget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="1024"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+        <!-- Skills Section -->
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skills"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Functions the LLM can call during chat"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutline"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Execute commands via Termux"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Run shell commands on device"
+                        android:textSize="12sp"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_termux"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cb_termux_permission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Request Termux permission"
+            app:iconSize="20dp" />
+
+        <TextView
+            android:id="@+id/tv_termux_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:paddingStart="8dp"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+
+</ScrollView>
