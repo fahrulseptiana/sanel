@@ -23,7 +23,11 @@
 
 ## Screenshots
 
-*(Coming soon)*
+<p align="center">
+  <img src="screenshots/chat.jpg" width="30%" alt="Chat">
+  <img src="screenshots/settings.jpg" width="30%" alt="Settings">
+  <img src="screenshots/drawer.jpg" width="30%" alt="Drawer">
+</p>
 
 ## Prerequisites
 
