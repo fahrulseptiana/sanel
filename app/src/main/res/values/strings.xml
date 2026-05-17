@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Sanel</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_settings">Settings</string>
+    <string name="send">Send</string>
+    <string name="message_hint">Type a message…</string>
+    <string name="title_settings">Settings</string>
+    <string name="label_endpoint">LLM Endpoint</string>
+    <string name="label_api_key">API Key</string>
+    <string name="label_model">Model Name</string>
+    <string name="label_advanced">Advanced</string>
+    <string name="label_temperature">Temperature</string>
+    <string name="label_max_tokens">Max Tokens</string>
+    <string name="label_thinking">Enable Thinking</string>
+    <string name="label_thinking_budget">Thinking Budget</string>
+    <string name="hint_endpoint">https://api.openai.com/v1/chat/completions</string>
+    <string name="hint_api_key">sk-…</string>
+    <string name="hint_model">gpt-4o</string>
+    <string name="pref_endpoint">pref_endpoint</string>
+    <string name="pref_api_key">pref_api_key</string>
+    <string name="pref_model">pref_model</string>
+    <string name="pref_temperature">pref_temperature</string>
+    <string name="pref_max_tokens">pref_max_tokens</string>
+    <string name="pref_thinking">pref_thinking</string>
+    <string name="pref_thinking_budget">pref_thinking_budget</string>
+</resources>
