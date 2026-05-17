@@ -24,9 +24,11 @@
 ## Screenshots
 
 <p align="center">
-  <img src="screenshots/chat.jpg" width="30%" alt="Chat">
-  <img src="screenshots/settings.jpg" width="30%" alt="Settings">
-  <img src="screenshots/drawer.jpg" width="30%" alt="Drawer">
+  <img src="screenshots/chat.jpg" width="19%" alt="Chat">
+  <img src="screenshots/settings.jpg" width="19%" alt="Settings">
+  <img src="screenshots/drawer.jpg" width="19%" alt="Drawer">
+  <img src="screenshots/toolcall.jpg" width="19%" alt="Tool Call">
+  <img src="screenshots/commands.jpg" width="19%" alt="Commands">
 </p>
 
 ## Prerequisites
