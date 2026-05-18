@@ -100,7 +100,7 @@ class ChatViewModel : ViewModel() {
                         messagesList.add(ChatMessage(
                             role = "assistant", isToolCall = true,
                             toolCallName = name, toolCallArgs = args,
-                            toolCallId = "call_${System.nanoTime()}"
+                            toolCallId = "call_\${System.nanoTime()}"
                         ))
                     }
                 }
@@ -129,9 +129,9 @@ class ChatViewModel : ViewModel() {
     fun getMessagesForSave(): List<Map<String, String>> {
         return messagesList.map { msg ->
             when {
-                msg.isCommand -> mapOf("role" to "assistant", "content" to "EXECUTE:${msg.content}|||${msg.commandOutput}|||${msg.commandLabel}")
+                msg.isCommand -> mapOf("role" to "assistant", "content" to "EXECUTE:\${msg.content}|||\${msg.commandOutput}|||\${msg.commandLabel}")
                 msg.role == "tool" && msg.toolCallId.isNotEmpty() -> mapOf("role" to "tool", "content" to msg.content, "tool_call_id" to msg.toolCallId)
-                msg.isToolCall -> mapOf("role" to msg.role, "content" to "TOOLCALL:${msg.toolCallName}(${msg.toolCallArgs})")
+                msg.isToolCall -> mapOf("role" to msg.role, "content" to "TOOLCALL:\${msg.toolCallName}(\${msg.toolCallArgs})")
                 else -> mapOf("role" to msg.role, "content" to msg.content)
             }
         }
@@ -217,7 +217,7 @@ class ChatViewModel : ViewModel() {
         val convId = ConversationManager.getCurrentId()
         val rawLogPath = if (convId != null && convId > 0) {
             File(ctx.filesDir, "debug").also { it.mkdirs() }
-            File(ctx.filesDir, "debug/${convId}_stream.jsonl").absolutePath
+            File(ctx.filesDir, "debug/\${convId}_stream.jsonl").absolutePath
         } else null
 
         LLMClient.streamChat(
@@ -239,8 +239,11 @@ class ChatViewModel : ViewModel() {
             },
             onError = { error ->
                 viewModelScope.launch {
-                    updateStreaming("\n\n[Error: $error]")
-                    _errorEvent.emit(error)
+                    // Don't show error if stream was intentionally cancelled (backgrounded)
+                    if (!error.contains("backgrounded")) {
+                        updateStreaming("\n\n[Error: \$error]")
+                        _errorEvent.emit(error)
+                    }
                     finishStreaming()
                 }
             }
@@ -254,7 +257,7 @@ class ChatViewModel : ViewModel() {
         loopCount++
         if (loopCount > maxLoops) {
             appendChatMessage(ChatMessage(
-                role = "assistant", content = "🛑  Stopped after $maxLoops iterations."
+                role = "assistant", content = "🛑  Stopped after \$maxLoops iterations."
             ))
             _isStreaming.value = false
             saveConversation()
@@ -287,7 +290,7 @@ class ChatViewModel : ViewModel() {
                         sameCommandRepeat = 0
                         appendChatMessage(ChatMessage(
                             role = "tool",
-                            content = "{\"error\":\"Blocked: same command repeated $maxSameCommand times\",\"guardrail\":\"same_command_repeat\",\"command\":\"$cmd\"}",
+                            content = "\{\"error\":\"Blocked: same command repeated \$maxSameCommand times\",\"guardrail\":\"same_command_repeat\",\"command\":\"\$cmd\"\}",
                             toolCallId = toolCallId
                         ))
                         saveConversation()
@@ -322,7 +325,7 @@ class ChatViewModel : ViewModel() {
                         totalFailures = 0
                         appendChatMessage(ChatMessage(
                             role = "tool",
-                            content = "{\"error\":\"Blocked: $maxFailures commands failed\",\"guardrail\":\"max_failures\"}",
+                            content = "\{\"error\":\"Blocked: \$maxFailures commands failed\",\"guardrail\":\"max_failures\"\}",
                             toolCallId = toolCallId
                         ))
                         saveConversation()
@@ -337,8 +340,8 @@ class ChatViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 appendChatMessage(ChatMessage(
-                    role = "assistant", content = "❌  $name failed: ${e.message}",
-                    isCommand = true, isStreaming = false, commandOutput = "Error: ${e.message}"
+                    role = "assistant", content = "❌  \$name failed: \${e.message}",
+                    isCommand = true, isStreaming = false, commandOutput = "Error: \${e.message}"
                 ))
             }
         }
@@ -351,8 +354,8 @@ class ChatViewModel : ViewModel() {
     companion object {
         private val termuxHints = listOf(
             Triple(127, Regex("which: .*command not found"), "Use `command -v <name>` instead of `which` — `which` is not installed in Termux by default."),
-            Triple(127, Regex("create-vite: not found|cva: not found"), "npx spawns `sh -c` internally. Install globally instead: `npm install -g create-vite && termux-fix-shebang \\$(which create-vite)`"),
-            Triple(126, Regex("bad interpreter|/usr/bin/env"), "Termux has no `/usr/bin/env`. Fix with `termux-fix-shebang \\$(which <name>)` or run via `node \\$(npm root -g)/<pkg>/index.js`"),
+            Triple(127, Regex("create-vite: not found|cva: not found"), "npx spawns `sh -c` internally. Install globally instead: `npm install -g create-vite && termux-fix-shebang \\\$(which create-vite)` or similar."),
+            Triple(126, Regex("bad interpreter|/usr/bin/env"), "Termux has no `/usr/bin/env`. Fix with `termux-fix-shebang \\\$(which <name>)` or run via `node \\\$(npm root -g)/<pkg>/index.js`"),
             Triple(127, Regex("env:.*node.*: No such file or directory|node: not found"), "Node not found in PATH. Use full path: `/data/data/com.termux/files/usr/bin/node`"),
             Triple(0, Regex("Command timed out"), "Command exceeded timeout. Try simpler commands or increase timeout in the tool call."),
             Triple(127, Regex("npx.*not found|npm.*not found"), "npm/npx not found. Install: `pkg install nodejs`"),
@@ -364,10 +367,10 @@ class ChatViewModel : ViewModel() {
                 val exitCode = (parsed["exit_code"] as? Double)?.toInt() ?: return result
                 val stderr = (parsed["stderr"] as? String) ?: ""
                 val stdout = (parsed["stdout"] as? String) ?: ""
-                val combined = "$stderr\n$stdout"
+                val combined = "\$stderr\n\$stdout"
                 for ((code, pattern, hint) in termuxHints) {
                     if (exitCode == code && pattern.containsMatchIn(combined)) {
-                        return result.trimEnd('}') + ",\"_hint\":\"$hint\"}"
+                        return result.trimEnd('}') + ",\"_hint\":\"\$hint\"}"
                     }
                 }
             } catch (_: Exception) {}
@@ -380,10 +383,10 @@ class ChatViewModel : ViewModel() {
         // Take first 2 exchanges (4 messages) for context
         val contextMsgs = messagesList.take(4).joinToString(" | ") {
             when {
-                it.role == "user" -> "User: ${it.content.take(100)}"
+                it.role == "user" -> "User: \${it.content.take(100)}"
                 it.isToolCall -> ""
                 it.isCommand -> ""
-                else -> "Assistant: ${it.content.take(100)}"
+                else -> "Assistant: \${it.content.take(100)}"
             }
         }.trimEnd(' ', '|', ' ', '|', ' ').trim()
         if (contextMsgs.isBlank()) {
@@ -396,7 +399,7 @@ class ChatViewModel : ViewModel() {
                 val bodyJson = com.google.gson.Gson().toJson(mapOf(
                     "model" to SettingsManager.model,
                     "messages" to listOf(
-                        mapOf("role" to "system", "content" to "Generate a short 3-5 word title for this conversation. Return ONLY the title — no sentences, no punctuation, no quotes. Example: 'Cat story writing' or 'Horror story help'."),
+                        mapOf("role" to "system", "content" to "Generate a short 3-5 word title for this conversation. Return ONLY the title — no sentences, no punctuation, no quotes. Example: [Writing a Blog Post, Python API Setup, Docker Debugging]"),
                         mapOf("role" to "user", "content" to contextMsgs)
                     ),
                     "max_tokens" to 30,
@@ -404,7 +407,7 @@ class ChatViewModel : ViewModel() {
                     "thinking" to mapOf("type" to "disabled")
                 ))
 
-                writeTitleDebug("request: $bodyJson")
+                writeTitleDebug("request: \$bodyJson")
 
                 val client = okhttp3.OkHttpClient.Builder()
                     .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
@@ -414,7 +417,7 @@ class ChatViewModel : ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     val req = okhttp3.Request.Builder()
                         .url(SettingsManager.endpoint)
-                        .header("Authorization", "Bearer ${SettingsManager.apiKey}")
+                        .header("Authorization", "Bearer \${SettingsManager.apiKey}")
                         .header("Content-Type", "application/json")
                         .post(bodyJson.toRequestBody("application/json".toMediaType()))
                         .build()
@@ -422,7 +425,7 @@ class ChatViewModel : ViewModel() {
                 }
 
                 val body = response.body?.string()
-                writeTitleDebug("response code=${response.code} body=${body?.take(300)}")
+                writeTitleDebug("response code=\${response.code} body=\${body?.take(300)}")
 
                 if (response.isSuccessful && body != null) {
                     val parsed = com.google.gson.Gson().fromJson(body, Map::class.java)
@@ -436,10 +439,10 @@ class ChatViewModel : ViewModel() {
                         ?.take(5)
                         ?.joinToString(" ")
                         ?.take(40)
-                    writeTitleDebug("extracted title: $title")
+                    writeTitleDebug("extracted title: \$title")
                     if (!title.isNullOrBlank()) {
                         val convId = ConversationManager.getCurrentId()
-                        writeTitleDebug("convId: $convId")
+                        writeTitleDebug("convId: \$convId")
                         if (convId != null) {
                             ConversationManager.updateTitle(convId, title)
                             writeTitleDebug("title updated")
@@ -447,7 +450,7 @@ class ChatViewModel : ViewModel() {
                     }
                 }
             } catch (e: Exception) {
-                writeTitleDebug("error: ${e::class.simpleName} msg=${e.message}")
+                writeTitleDebug("error: \${e::class.simpleName} msg=\${e.message}")
             }
         }
     }
@@ -456,7 +459,7 @@ class ChatViewModel : ViewModel() {
         try {
             val f = java.io.File(appContext?.filesDir, "debug/title_debug.log")
             f.parentFile?.mkdirs()
-            f.appendText("${System.currentTimeMillis()}: $msg\n")
+            f.appendText("\${System.currentTimeMillis()}: \$msg\n")
         } catch (_: Exception) {}
     }
 }
