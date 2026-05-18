@@ -239,8 +239,11 @@ class ChatViewModel : ViewModel() {
             },
             onError = { error ->
                 viewModelScope.launch {
-                    updateStreaming("\n\n[Error: $error]")
-                    _errorEvent.emit(error)
+                    // Don't show error if stream was intentionally cancelled (backgrounded)
+                    if (!error.contains("backgrounded")) {
+                        updateStreaming("\n\n[Error: $error]")
+                        _errorEvent.emit(error)
+                    }
                     finishStreaming()
                 }
             }
@@ -351,8 +354,8 @@ class ChatViewModel : ViewModel() {
     companion object {
         private val termuxHints = listOf(
             Triple(127, Regex("which: .*command not found"), "Use `command -v <name>` instead of `which` — `which` is not installed in Termux by default."),
-            Triple(127, Regex("create-vite: not found|cva: not found"), "npx spawns `sh -c` internally. Install globally instead: `npm install -g create-vite && termux-fix-shebang \\$(which create-vite)`"),
-            Triple(126, Regex("bad interpreter|/usr/bin/env"), "Termux has no `/usr/bin/env`. Fix with `termux-fix-shebang \\$(which <name>)` or run via `node \\$(npm root -g)/<pkg>/index.js`"),
+            Triple(127, Regex("create-vite: not found|cva: not found"), "npx spawns `sh -c` internally. Install globally instead: `npm install -g create-vite && termux-fix-shebang \\\$(which create-vite)` or similar."),
+            Triple(126, Regex("bad interpreter|/usr/bin/env"), "Termux has no `/usr/bin/env`. Fix with `termux-fix-shebang \\\$(which <name>)` or run via `node \\\$(npm root -g)/<pkg>/index.js`"),
             Triple(127, Regex("env:.*node.*: No such file or directory|node: not found"), "Node not found in PATH. Use full path: `/data/data/com.termux/files/usr/bin/node`"),
             Triple(0, Regex("Command timed out"), "Command exceeded timeout. Try simpler commands or increase timeout in the tool call."),
             Triple(127, Regex("npx.*not found|npm.*not found"), "npm/npx not found. Install: `pkg install nodejs`"),
@@ -396,7 +399,7 @@ class ChatViewModel : ViewModel() {
                 val bodyJson = com.google.gson.Gson().toJson(mapOf(
                     "model" to SettingsManager.model,
                     "messages" to listOf(
-                        mapOf("role" to "system", "content" to "Generate a short 3-5 word title for this conversation. Return ONLY the title — no sentences, no punctuation, no quotes. Example: 'Cat story writing' or 'Horror story help'."),
+                        mapOf("role" to "system", "content" to "Generate a short 3-5 word title for this conversation. Return ONLY the title — no sentences, no punctuation, no quotes. Example: [Writing a Blog Post, Python API Setup, Docker Debugging]"),
                         mapOf("role" to "user", "content" to contextMsgs)
                     ),
                     "max_tokens" to 30,

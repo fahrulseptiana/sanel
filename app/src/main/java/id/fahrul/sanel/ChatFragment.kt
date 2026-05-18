@@ -85,6 +85,14 @@ class ChatFragment : Fragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Cancel streaming when app goes to background
+        if (StreamingManager.isStreamActive()) {
+            StreamingManager.cancelActiveStream("App paused - backgrounded")
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         binding.recyclerChat.post {

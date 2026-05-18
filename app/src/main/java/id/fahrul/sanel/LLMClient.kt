@@ -17,6 +17,7 @@ object LLMClient {
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(120, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
+        .pingInterval(30, TimeUnit.SECONDS)  // Keep-alive ping to maintain connection
         .build()
 
     private val JSON = "application/json".toMediaType()
@@ -46,14 +47,19 @@ object LLMClient {
             .post(body.toRequestBody(JSON))
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
+        val call = client.newCall(request)
+        StreamingManager.setActiveCall(call)  // Track active call for lifecycle management
+
+        call.enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
+                StreamingManager.setActiveCall(null)
                 onError("Network error: ${e.message}")
             }
 
             override fun onResponse(call: Call, response: okhttp3.Response) {
                 if (!response.isSuccessful) {
                     val errorBody = response.body?.string() ?: "Unknown error"
+                    StreamingManager.setActiveCall(null)
                     onError("HTTP ${response.code}: $errorBody")
                     return
                 }
@@ -73,6 +79,13 @@ object LLMClient {
                         val l = line ?: continue
                         if (!l.startsWith("data: ")) continue
 
+                        // Check if stream was cancelled (app backgrounded)
+                        if (call.isCanceled()) {
+                            StreamingManager.setActiveCall(null)
+                            onError("Stream cancelled: app backgrounded")
+                            return
+                        }
+
                         // Log raw SSE data for debugging
                         val rawLine = l.removePrefix("data: ").trim()
                         if (rawLine != "[DONE]") {
@@ -85,7 +98,11 @@ object LLMClient {
 
                         val data = rawLine
                         if (data == "[DONE]") {
-                            if (!doneCalled) { doneCalled = true; onDone() }
+                            if (!doneCalled) { 
+                                doneCalled = true
+                                StreamingManager.setActiveCall(null)
+                                onDone()
+                            }
                             return
                         }
 
@@ -131,7 +148,7 @@ object LLMClient {
                                         val cmdMatch = Regex("<longcat_arg_value>(.*?)</longcat_arg_value>", RegexOption.DOT_MATCHES_ALL).find(accumulated)
                                         val cmd = cmdMatch?.groupValues?.get(1)?.trim() ?: ""
                                         if (cmd.isNotEmpty()) {
-                                            onToolCall("call_${System.nanoTime()}", "execute_command", """{"command":"$cmd"}""")
+                                            onToolCall("call_${System.nanoTime()}", "execute_command", """\{"command":"$cmd"\}""")
                                         }
                                     } else if (startsWithToolCall) {
                                         // Full TOOLCALL header detected — extract command from JSON
@@ -141,7 +158,7 @@ object LLMClient {
                                             val cmd = parsed["command"]?.toString() ?: ""
                                             if (cmd.isNotEmpty()) {
                                                 xmlToolCallDetected = true
-                                                onToolCall("call_${System.nanoTime()}", "execute_command", """{"command":"$cmd"}""")
+                                                onToolCall("call_${System.nanoTime()}", "execute_command", """\{"command":"$cmd"\}""")
                                             }
                                         } catch (_: Exception) {}
                                     } else if (accumulated.contains("TOOLCALL:execute_command(")) {
@@ -157,7 +174,7 @@ object LLMClient {
                                             val cmd = parsed["command"]?.toString() ?: ""
                                             if (cmd.isNotEmpty()) {
                                                 xmlToolCallDetected = true
-                                                onToolCall("call_${System.nanoTime()}", "execute_command", """{"command":"$cmd"}""")
+                                                onToolCall("call_${System.nanoTime()}", "execute_command", """\{"command":"$cmd"\}""")
                                             }
                                         } catch (_: Exception) {}
                                     } else if (startsWithExecute) {
@@ -211,6 +228,7 @@ object LLMClient {
                                     } else {
                                         onDone()
                                     }
+                                    StreamingManager.setActiveCall(null)
                                     return
                                 }
                             }
@@ -219,7 +237,9 @@ object LLMClient {
                         }
                     }
                     if (!doneCalled && !xmlToolCallDetected) onDone()
+                    StreamingManager.setActiveCall(null)
                 } catch (e: Exception) {
+                    StreamingManager.setActiveCall(null)
                     onError("Stream error: ${e.message}")
                 }
             }
